@@ -2,23 +2,28 @@
 
 require 'cinch'
 
-def say(words)
-  system "espeak -v en-sc -k5 -s150 \"#{words}\""
-end
+require_relative "modules/speech.rb"
+require_relative "modules/video_identifier.rb"
+
+YOUTUBE_REGEX = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
 
 bot = Cinch::Bot.new do
   configure do |c|
-    c.nick   = "jsrnbot"
+    c.nick = "jsrnbot"
     c.server = "irc.freenode.org"
     c.channels = ["#slothkrew"]
   end
 
-  on :message, /jsrnbot: (.+)/ do |_, arg|
-    command = arg
-    command = command.split(";").first
-    command = command.split("&").first
-    command = command.gsub(/[^A-Za-z0-9 ]/, "")
-    say command
+  on :message, /jsrnbot: (.+)/ do |_, message|
+    Speech.say(message)
+  end
+
+  on :message, /(.*)/ do |m, message|
+    youtube_match = message =~ YOUTUBE_REGEX
+
+    if youtube_match
+      m.reply VideoIdentifier.identify(message)
+    end
   end
 end
 
