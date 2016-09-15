@@ -14,8 +14,12 @@ bot = Cinch::Bot.new do
     c.channels = ["#slothkrew"]
   end
 
-  on :message, /jsrnbot: (.+)/ do |_, message|
+  on :message, /!jsrnbot say (.+)/ do |_, message|
     Speech.say(message)
+  end
+
+  on :message, /!jsrnbot help/ do |m, message|
+    m.reply "Visit http://jsrn.net/jsrnbot for more info"
   end
 
   on :message, /(.*)/ do |m, message|
